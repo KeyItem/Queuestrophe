@@ -1,2 +1,2 @@
 # Queuestrophe
-Waiting in line has never felt so good!
+Waiting in line has never felt this good!
