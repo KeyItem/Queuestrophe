@@ -35,6 +35,12 @@ public class EntityController : MonoBehaviour
     [Space(10)]
     public bool isEntityCapturingCollisions = true;
 
+    [Header("Entity Interaction")]
+    public EntityInteraction interaction;
+
+    [Space(10)]
+    public bool isEntityCapturingInteraction = true;
+
     private void Start()
     {
         InitializeEntity();
@@ -46,6 +52,7 @@ public class EntityController : MonoBehaviour
         {
             ManageInput();
             ManageCollision();
+            ManageInteraction();
         } 
     }
 
@@ -62,6 +69,7 @@ public class EntityController : MonoBehaviour
         input = GetComponent<EntityInput>();
         movement = GetComponent<EntityMovement>();
         collision = GetComponent<EntityCollision>();
+        interaction = GetComponent<EntityInteraction>();
     }
 
     public virtual void ManageInput()
@@ -78,7 +86,8 @@ public class EntityController : MonoBehaviour
     {
         if (isEntityCapturingMovement)
         {
-            movement.MoveEntity(inputValues, collisionInfo);
+            movement.ManageEntityRotation(inputValues, collisionInfo);
+            movement.ManageEntityMovement(inputValues, collisionInfo);
         }
     }
 
@@ -87,6 +96,14 @@ public class EntityController : MonoBehaviour
         if (isEntityCapturingCollisions)
         {
             collisionInfo = collision.ReturnCollisionInfo();
+        }
+    }
+
+    public virtual void ManageInteraction()
+    {
+        if (isEntityCapturingInteraction)
+        {
+            interaction.ManageInteraction(inputValues, collisionInfo);
         }
     }
 }

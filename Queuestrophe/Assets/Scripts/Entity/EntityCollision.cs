@@ -31,16 +31,10 @@ public class EntityCollision : MonoBehaviour
         ReturnEntityColliderDimensions();
     }
 
-    public virtual void OnDrawGizmos()
-    {
-        Gizmos.color = Color.black;
-
-        Gizmos.DrawWireSphere(entityCollisionInfo.baseGroundData.groundPoint, 0.25f);
-    }
-
     public virtual void ProcessCollisions()
     {
         UpdateObjectGroundingBounds();
+        
         CollisionGroundCheck();
     }
 
@@ -53,7 +47,7 @@ public class EntityCollision : MonoBehaviour
     {
         RaycastHit sphereHit = new RaycastHit();
 
-        if (Physics.SphereCast(transform.position, entityCollisionAttributes.entitySpherePointRadius, -transform.up, out sphereHit, entityCollisionAttributes.entitySphereCollisionRayLength, entityCollisionAttributes.entityGroundCollisionMask))
+        if (Physics.SphereCast(transform.position, entityCollisionAttributes.groundSphereRadius, -transform.up, out sphereHit, entityCollisionAttributes.groundSphereRayLength, entityCollisionAttributes.groundCollisionMask))
         {
             entityCollisionInfo.groundInfo = new GroundInfo(entityGroundingBounds.objectGroundingBounds.Length);
 
@@ -63,17 +57,13 @@ public class EntityCollision : MonoBehaviour
             {
                 RaycastHit rayHit = new RaycastHit();
 
-                Debugger.DrawMultipleCustomDebugRayMultipleStarts(entityGroundingBounds.objectGroundingBounds, -transform.up * entityCollisionAttributes.entityCollisionRayLength, Color.yellow);
-
-                if (Physics.Raycast(entityGroundingBounds.objectGroundingBounds[i], -transform.up, out rayHit, entityCollisionAttributes.entityCollisionRayLength, entityCollisionAttributes.entityGroundCollisionMask))
+                if (Physics.Raycast(entityGroundingBounds.objectGroundingBounds[i], -transform.up, out rayHit, entityCollisionAttributes.slopeRayLength, entityCollisionAttributes.groundCollisionMask))
                 {
-                    Debugger.DrawCustomDebugRay(transform.position, -transform.up * entityCollisionAttributes.entityCollisionRayLength, Color.green);
-
                     entityCollisionInfo.groundInfo.groundData[i] = new GroundData(rayHit.point, true, rayHit.distance, rayHit.normal, ReturnSlopeAngle(rayHit.normal, Vector3.up), ReturnSlopeCheck(rayHit.normal));
                 }
                 else
                 {
-                    entityCollisionInfo.groundInfo.groundData[i] = new GroundData(sphereHit.point, true, sphereHit.distance, sphereHit.normal, ReturnSlopeAngle(sphereHit.normal, Vector3.up), false);
+                    entityCollisionInfo.groundInfo.groundData[i] = new GroundData(sphereHit.point, true, sphereHit.distance, sphereHit.normal, ReturnSlopeAngle(sphereHit.normal, Vector3.up), ReturnSlopeCheck(sphereHit.normal));           
                 }
             }          
         }
@@ -134,17 +124,14 @@ public struct EntityCollisionAttributes
     public float entityCollisionSkinWidth;
 
     [Header("Object Collision Sphere Check Radius")]
-    public float entitySpherePointRadius;
+    public float groundSphereRadius;
 
     [Header("Object Collision Ray Length")]
-    public float entitySphereCollisionRayLength;
-    public float entityCollisionRayLength;
+    public float groundSphereRayLength;
+    public float slopeRayLength;
 
     [Header("Collision Layers")]
-    public LayerMask entityCollisionMask;
-
-    [Space(10)]
-    public LayerMask entityGroundCollisionMask;
+    public LayerMask groundCollisionMask;
 }
 
 [System.Serializable]
